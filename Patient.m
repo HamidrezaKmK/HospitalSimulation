@@ -9,14 +9,12 @@ classdef Patient
     
     methods
         function obj = Patient()
-            obj.status = "in checkin queue";
+            obj.status = 'in checkin queue';
             obj.hasCorona = rand(1, 1) > 0.9;
         end
-        
-        function outputArg = method1(obj,inputArg)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes heres
-            outputArg = obj.status + inputArg;
+         
+        function bored(obj)
+            obj.status = 'bored';
         end
     end
 end
