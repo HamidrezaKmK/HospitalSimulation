@@ -1,6 +1,6 @@
 ENTER_HOSPITAL = 0;
 CHECKIN = 1;
-ASSIGN_ROOM = 2
+ASSIGN_ROOM = 2;
 ENTER_ROOM = 3;
 CHECKUP = 4;
 EXIT_HOSPITAL = 5;
@@ -52,18 +52,19 @@ while (E.size() > 0)
         case ENTER_HOSPITAL
             disp('Enter Hospital');
             patient = hospital.patients{patientId};
+            patient.enterHospital(clock);
             if (hospital.reception.add(patientId, patient.hasCorona, clock) > 0)
                 % Start checkin if possible
-                E.insert([clock, CHECKIN, -1, -1, -1])
+                E.insert([clock, CHECKIN, -1, -1, -1]);
             end
         case CHECKIN
             disp('Checkin');
-            [duration, success, patientId, workerId] = hospital.reception.checkIn();
+            [duration, success, patientId, workerId] = hospital.reception.checkIn(clock);
             if (success == 1)
                 E.insert([clock + duration, ASSIGN_ROOM, patientId, -1, -1])
             end
         case ASSIGN_ROOM
-            disp('Assing room');
+            disp('Assign room');
             
             % Find best room
             cnt = 1;
@@ -90,6 +91,7 @@ while (E.size() > 0)
             disp('Move to room queue');
             disp(patientId);
             patient = hospital.patients{patientId};
+            patient.enterRoom(clock);
             room = hospital.rooms{roomId};
             if (room.add(patientId, patient.hasCorona, clock) > 0)
                 E.insert([clock, CHECKUP, -1, roomId, -1])
@@ -97,16 +99,23 @@ while (E.size() > 0)
         case CHECKUP
             disp('Checkup patient');
             room = hospital.rooms{roomId};
-            [duration, success, patientId, workerId] = room.checkIn();
+            [duration, success, patientId, workerId] = room.checkIn(clock);
+            patient = hospital.patients{patientId};
+            patient.checkup(clock);
             disp(patientId);
             if (success == 1)
-                E.insert([clock + duration, EXIT_HOSPITAL, patientId, -1, -1])
+                E.insert([clock + duration, EXIT_HOSPITAL, patientId, -1, -1]);
             end
         case EXIT_HOSPITAL
-            disp('Leaveing happy')
+            disp('Leaveing happy');
+            patient = hospital.patients{patientId};
+            patient.exitHospital(clock);
         case GOT_BORED
-            disp('Leaveing sad')
-            patient = hospital.patients{patientId}; 
-            patient.bored();
+            patient = hospital.patients{patientId};
+            if (patient.status == Patient.IN_RECEPTION_QUEUE)
+                disp('Leaveing sad'); 
+                hospital.reception.patientGetsBored(clock, patientId); 
+                patient.bored(clock);
+            end
     end
 end
