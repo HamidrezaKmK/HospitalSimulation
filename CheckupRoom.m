@@ -10,7 +10,6 @@ classdef CheckupRoom < handle
     end
     
     properties (Access = private)
-        boredPatientsSet
         boredPatientsCount
     end
     
@@ -24,8 +23,6 @@ classdef CheckupRoom < handle
             obj.queueHistory.time = zeros(1);
             obj.queueHistory.lengths = zeros(1);
             obj.boredPatientsCount = 0;
-            %todo:
-            obj.boredPatientsSet = {};
         end
         
         function sz = add(obj, patientId, hasCorona, time)
@@ -49,20 +46,19 @@ classdef CheckupRoom < handle
             success = 0;
             patientId = 0;
             workerId = 0;
-            while (obj.queue.size() > 0)
-                patientId = obj.queue.peek();
-                patientId = patientId(3);
-                if (~obj.checkIsBored(patientId))
-                    break;
-                end
-                obj.queue.remove();
-            end
-            obj.changeQueueSize(clock, 0);
             if (obj.queue.size() == 0)
                 return
             end
             freeWorkers = find(~obj.busy);
+            disp('DEBUG3: ------------------------------')
+            disp(freeWorkers);
+            disp(obj.busy);
+            if (isempty(freeWorkers))
+                return
+            end
             workerId = freeWorkers(randi(length(freeWorkers)));
+            disp('DEBUG: ------------------------------')
+            disp(workerId);
             obj.busy(workerId) = 1;
             duration = poissrnd(obj.serviceRates(workerId));
             success = 1;
@@ -75,12 +71,13 @@ classdef CheckupRoom < handle
             obj.busy(workerId) = 0;
         end
         
-        function patientGetsBored(obj, clock, patientId)
-            obj.boredPatientsCount = obj.boredPatientsCount + 1;
-            %todo
-            obj.boredPatientsSet{obj.boredPatientsCount} = patientId;
-            
+        function patientGetsBored(obj, clock)
+            obj.boredPatientsCount = obj.boredPatientsCount + 1;            
             obj.changeQueueSize(clock, -1);
+        end
+        
+        function sz = length(obj)
+            sz = obj.queue.size();
         end
     end
     
@@ -97,17 +94,6 @@ classdef CheckupRoom < handle
             lastLength = obj.queueHistory.lengths(length(obj.queueHistory.lengths));
             obj.addToHistory(clock, lastLength);
             obj.addToHistory(clock, lastLength + diff);
-        end
-        
-        function is = checkIsBored(obj, patientId)
-            % returns true if the patient with that id is bored!
-            % TODO: good implementation using set-like data structure
-            is = 0;
-            for i = 1:obj.boredPatientsCount
-                if patientId == obj.boredPatientsSet{i}
-                    is = 1;
-                end
-            end
         end
     end
 end

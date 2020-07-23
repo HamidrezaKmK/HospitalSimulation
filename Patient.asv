@@ -7,6 +7,8 @@ classdef Patient < handle
         hasCorona
         timeInSystem
         timeInQueue
+        boredDuration
+        boredTime
     end
     
     properties (Access = private)
@@ -17,30 +19,26 @@ classdef Patient < handle
     properties (Constant)
       % status mapping:
       IN_RECEPTION_QUEUE = 1;
-      CHECKIN = 2;
-      IN_ROOM_QUEUE = 3;
-      DURING_CHECKUP = 4;
-      NOT_IN_HOSPITAL = 5;
-      BORED = 6;
+      IN_ROOM_QUEUE = 2;
+      DURING_CHECKUP = 3;
+      NOT_IN_HOSPITAL = 4;
+      BORED = 5;
     end
     
     methods
-        function obj = Patient()
+        function obj = Patient(boredDuration, clock)
             obj.status = Patient.NOT_IN_HOSPITAL;
             obj.hasCorona = rand(1, 1) > 0.9;
             obj.timeInSystem = 0;
             obj.timeInQueue = 0;
             obj.lastEventTime = 0;
+            obj.boredDuration = boredDuration;
+            obj.boredTime = 
         end
          
         function enterHospital(obj, clock)
             obj.elapseTime(clock);
             obj.status = Patient.IN_RECEPTION_QUEUE;
-        end
-        
-        function checkin(obj, clock)
-            obj.elapseTime(clock);
-            obj.status = Patient.CHECKIN;
         end
         
         function enterRoom(obj, clock)
@@ -64,6 +62,10 @@ classdef Patient < handle
             obj.status = Patient.BORED;
         end
         
+        function renewBoredTime(obj, clock)
+            obj.boredTim
+        end
+        
     end
     
     methods (Access = private)
@@ -73,19 +75,14 @@ classdef Patient < handle
             switch obj.status
                 case Patient.IN_RECEPTION_QUEUE
                     obj.timeInSystem = obj.timeInSystem + deltaTime;
-                case Patient.CHECKIN
-                        obj.timeInSystem = obj.timeInSystem + deltaTime;
-            
+                    obj.timeInQueue = obj.timeInQueue + deltaTime;
                 case Patient.IN_ROOM_QUEUE
+                    obj.timeInSystem = obj.timeInSystem + deltaTime;
+                    obj.timeInQueue = obj.timeInQueue + deltaTime;
                 case Patient.DURING_CHECKUP
-                case Patient.NOT_IN_HOSPITAL
+                    obj.timeInSystem = obj.timeInSystem + deltaTime;
                 case Patient.BORED
-     
-            if (obj.status == Patient.IN_QUEUE)
-                obj.timeInQueue = obj.timeInQueue + deltaTime;
-            end
-            if (obj.status ~= Patient.NOT_IN_HOSPITAL)
-                obj.timeInSystem = obj.timeInSystem + deltaTime;
+                    obj.timeInSystem = obj.timeInSystem + deltaTime;
             end
             obj.lastEventTime = clock;
         end

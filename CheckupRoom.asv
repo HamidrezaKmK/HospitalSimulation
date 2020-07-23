@@ -10,7 +10,7 @@ classdef CheckupRoom < handle
     end
     
     properties (Access = private)
-        boredPatientsSet
+        boredPatientsCount
     end
     
     methods
@@ -22,6 +22,7 @@ classdef CheckupRoom < handle
             obj.busy = zeros(1, length(serviceRates));
             obj.queueHistory.time = zeros(1);
             obj.queueHistory.lengths = zeros(1);
+            obj.boredPatientsCount = 0;
         end
         
         function sz = add(obj, patientId, hasCorona, time)
@@ -45,20 +46,15 @@ classdef CheckupRoom < handle
             success = 0;
             patientId = 0;
             workerId = 0;
-            while (obj.queue.size() > 0)
-                patientId = obj.queue.peek();
-                patientId = patientId(3);
-                patient = hospital.patients{patientId};
-                if (patient.status ~= Patient.BORED)
-                    break;
-                end
-                obj.queue.remove();
-            end
-            obj.addToHistory(clock);
             if (obj.queue.size() == 0)
                 return
             end
             freeWorkers = find(~obj.busy);
+            if (freeWorkers == 0)
+                return
+            end
+            disp('DEBUG: ------------------------------')
+            disp(freeWorkers);
             workerId = freeWorkers(randi(length(freeWorkers)));
             obj.busy(workerId) = 1;
             duration = poissrnd(obj.serviceRates(workerId));
@@ -72,8 +68,8 @@ classdef CheckupRoom < handle
             obj.busy(workerId) = 0;
         end
         
-        function patientGetsBored(obj, clock, patientId)
-            
+        function patientGetsBored(obj, clock)
+            obj.boredPatientsCount = obj.boredPatientsCount + 1;            
             obj.changeQueueSize(clock, -1);
         end
     end
@@ -92,10 +88,6 @@ classdef CheckupRoom < handle
             obj.addToHistory(clock, lastLength);
             obj.addToHistory(clock, lastLength + diff);
         end
-        
-        function is = checkIsBored(obj, patientId)
-            % returns true if the patient with that id is bored!
-            % TODO: good implementation using set-like data structure
     end
 end
 
