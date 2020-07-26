@@ -11,8 +11,8 @@ GOT_BORED = 6;
 
 disp('-------Hospital Simulation-------');
 disp('Please Enter M/lambda/alpha/mu');
-M = 1; % input('Enter M (The number of rooms): ');
-lambda = 1; % input('Enter lambda (Average patients arrival): ');
+M =  input('Enter M (The number of rooms): ');
+lambda =  input('Enter lambda (Average patients arrival): ');
 alpha = 1; % input('Enter alpha (Average time of patients fatigue): ');
 mu = 1; % input('Enter mu (The service rate of reception): ');
     
