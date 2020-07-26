@@ -7,6 +7,9 @@ classdef Patient < handle
         hasCorona
         timeInSystem
         timeInQueue
+        boredDuration
+        boredTime
+        beginTimeInSystem
     end
     
     properties (Access = private)
@@ -17,24 +20,33 @@ classdef Patient < handle
     properties (Constant)
       % status mapping:
       IN_RECEPTION_QUEUE = 1;
-      IN_ROOM_QUEUE = 2;
-      DURING_CHECKUP = 3;
-      NOT_IN_HOSPITAL = 4;
-      BORED = 5;
+      DURING_CHECKIN = 2;
+      IN_ROOM_QUEUE = 3;
+      DURING_CHECKUP = 4;
+      NOT_IN_HOSPITAL = 5;
+      BORED = 6;
     end
     
     methods
-        function obj = Patient()
+        function obj = Patient(boredDuration, clock)
             obj.status = Patient.NOT_IN_HOSPITAL;
             obj.hasCorona = rand(1, 1) > 0.9;
             obj.timeInSystem = 0;
             obj.timeInQueue = 0;
             obj.lastEventTime = 0;
+            obj.boredDuration = boredDuration;
+            obj.boredTime = clock + boredDuration;
         end
          
         function enterHospital(obj, clock)
             obj.elapseTime(clock);
             obj.status = Patient.IN_RECEPTION_QUEUE;
+            obj.beginTimeInSystem = clock;
+        end
+        
+        function checkin(obj, clock)
+            obj.elapseTime(clock);
+            obj.status = Patient.DURING_CHECKIN;
         end
         
         function enterRoom(obj, clock)
@@ -56,6 +68,10 @@ classdef Patient < handle
             % event getting bored
             obj.elapseTime(clock);
             obj.status = Patient.BORED;
+        end
+        
+        function renewBoredTime(obj, clock)
+            obj.boredTime = obj.boredDuration - obj.timeInQueue + clock;
         end
         
     end

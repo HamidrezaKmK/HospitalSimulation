@@ -1,0 +1,23 @@
+function findOptimalRate = (input)
+    R = 1;
+    original_rates = input.rates;
+    while true
+        for i = 1:length(input.rates)
+            input.rates{i} = input.rates{i} + R;
+        end
+        if getMaxQueueLength(simulate(input)) == 0
+            break;
+        end
+        R = R + R;
+    end
+    X = linspace(0, R, 50);
+    Y = [];
+    for x = X
+        for i = 1:length(input.rates)
+            input.rates{i} = original_rates{i} + x;
+        end
+        Y(end+1) = getMaxQueueLength(simulate(input));
+    end
+    figure(1);
+    plot(X, Y), xlabel("rate added value", 
+end
