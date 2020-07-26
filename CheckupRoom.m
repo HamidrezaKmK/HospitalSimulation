@@ -65,7 +65,7 @@ classdef CheckupRoom < handle
             workerId = freeWorkers(randi(length(freeWorkers)));
             
             obj.busy(workerId) = 1;
-            duration = poissrnd(obj.serviceRates(workerId));
+            duration = exprnd(1/obj.serviceRates(workerId));
             success = 1;
             patientId = obj.queue.remove();
             patientId = patientId(3);

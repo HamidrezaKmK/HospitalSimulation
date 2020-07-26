@@ -27,5 +27,5 @@ function findOptimalRate(input)
         pnt = pnt+1;
     end
     figure(1);
-    plot(X, Y), xlabel("rate added value"), ylabel("mean queue time"), title("optimize rates"); 
+    plot(X, Y), xlabel('rate added value'), ylabel('mean queue time'), title('optimize rates'); 
 end

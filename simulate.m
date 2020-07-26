@@ -29,7 +29,7 @@ function hospital = simulate(simulationInput)
     for i = 1:patient_count
         dt = exprnd(1/lambda);
         T_accumulated = T_accumulated + dt;
-        boredDuration = exprnd(1/alpha);
+        boredDuration = exprnd(alpha);
         entrance_event = [T_accumulated, ENTER_HOSPITAL, i, -1, -1];
         E.insert(entrance_event);
         bored_event = [T_accumulated + boredDuration, GOT_BORED, i, -1, -1];
@@ -81,12 +81,15 @@ function hospital = simulate(simulationInput)
                 for i = 2:M
                     bestRoomScore = hospital.rooms{bestRoomIds{1}}.length();
                     thisRoomScore = hospital.rooms{i}.length();
-                    if (bestRoomScore < thisRoomScore)
-                        bestRoomIds = {};
-                        cnt = 0;
+                    disp(bestRoomScore);
+                    disp(thisRoomScore);
+                    if (bestRoomScore > thisRoomScore)
+                        bestRoomIds = {i};
+                        cnt = 1;
+                    elseif (bestRoomScore == thisRoomScore)
+                        cnt = cnt + 1;
+                        bestRoomIds{cnt} = i;
                     end
-                    bestRoomIds{cnt} = i;
-                    cnt = cnt + 1;
                 end
                 bestRoomId = bestRoomIds{randi(cnt)};
 
@@ -108,12 +111,13 @@ function hospital = simulate(simulationInput)
                 patient.renewBoredTime(clock)
                 E.insert([patient.boredTime, GOT_BORED, patientId, roomId, -1])
             case CHECKUP
-                %disp('Checkup patient');
                 room = hospital.rooms{roomId};
                 [duration, success, patientId, workerId] = room.checkIn(clock);
                 if (success == 0)
                     continue
                 end
+                %disp('Checkup patient');
+                %disp(patientId);
                 if (patient.status == Patient.BORED)
                     E.insert([clock, CHECKUP, -1, roomId, -1]);
                     continue
@@ -124,6 +128,7 @@ function hospital = simulate(simulationInput)
                 E.insert([clock + duration, EXIT_HOSPITAL, patientId, roomId, workerId]);
             case EXIT_HOSPITAL
                 %disp('Leaveing happy');
+                %disp(patientId);
                 %disp('DEBUG2: ------------------------------')
                 %disp(workerId)
                 patient = hospital.patients{patientId};
@@ -146,7 +151,7 @@ function hospital = simulate(simulationInput)
                 else
                     continue
                 end
-                %disp('Leaveing sad');
+                % disp('Leaveing sad');
                 patient.bored(clock);
         end
     end

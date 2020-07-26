@@ -8,7 +8,7 @@ function simulationInput = getInputParameters()
     simulationInput.mu = input('Enter mu (The service rate of reception): ');
     simulationInput.rates = {};
     for i = 1:simulationInput.M
-        simulationInput.rates{i} = input(sprintf("Enter service rates of room no. %d as a vector: ", i));
+        simulationInput.rates{i} = input(sprintf('Enter service rates of room no. %d as a vector: ', i));
     end
     simulationInput.patient_count = input('Enter the number of patients: ');
 end
