@@ -81,8 +81,8 @@ function hospital = simulate(simulationInput)
                 for i = 2:M
                     bestRoomScore = hospital.rooms{bestRoomIds{1}}.length();
                     thisRoomScore = hospital.rooms{i}.length();
-                    disp(bestRoomScore);
-                    disp(thisRoomScore);
+                    %disp(bestRoomScore);
+                    %disp(thisRoomScore);
                     if (bestRoomScore > thisRoomScore)
                         bestRoomIds = {i};
                         cnt = 1;
@@ -143,11 +143,11 @@ function hospital = simulate(simulationInput)
                 end
                 if (roomId == -1)
                     if (patient.status == Patient.IN_RECEPTION_QUEUE)
-                        hospital.reception.patientGetsBored(clock);
+                        hospital.reception.patientGetsBored(patient.hasCorona, clock);
                     end
                 elseif (patient.status == Patient.IN_ROOM_QUEUE)
                     room = hospital.rooms{roomId};
-                    room.patientGetsBored(clock);
+                    room.patientGetsBored(patient.hasCorona, clock);
                 else
                     continue
                 end

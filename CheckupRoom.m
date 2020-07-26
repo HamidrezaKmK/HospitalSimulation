@@ -24,8 +24,8 @@ classdef CheckupRoom < handle
             obj.serviceRates = serviceRates;
             obj.queue = PriorityQueue();
             obj.busy = zeros(1, length(serviceRates));
-            obj.queueHistory.time = {0};
-            obj.queueHistory.lengths = {0};
+            obj.queueHistory.time = {{0}, {0}, {0}};
+            obj.queueHistory.lengths = {{0}, {0}, {0}};
             obj.boredPatientsCount = 0;
             obj.queueAverageSize = 0;
         end
@@ -36,7 +36,7 @@ classdef CheckupRoom < handle
             if (hasCorona == 1)
                 score = -1 / time;
             end
-            obj.changeQueueSize(time, 1);
+            obj.changeQueueSize(hasCorona, time, 1);
             obj.queue.insert([score, time, patientId]);
             sz = length(obj.busy) - nnz(obj.busy);
         end
@@ -70,7 +70,7 @@ classdef CheckupRoom < handle
             patientId = obj.queue.remove();
             patientId = patientId(3);
             if obj.hospital.patients{patientId}.status ~= Patient.BORED
-                obj.changeQueueSize(clock, -1);
+                obj.changeQueueSize(obj.hospital.patients{patientId}.hasCorona, clock, -1);
             end
         end
         
@@ -78,29 +78,29 @@ classdef CheckupRoom < handle
             obj.busy(workerId) = 0;
         end
         
-        function patientGetsBored(obj, clock)
+        function patientGetsBored(obj, hasCorona, clock)
             obj.boredPatientsCount = obj.boredPatientsCount + 1;            
-            obj.changeQueueSize(clock, -1);
+            obj.changeQueueSize(hasCorona, clock, -1);
         end
         
         function sz = length(obj)
             sz = obj.queue.size();
         end
         
-        function addToHistory(obj, clock, len)
+        function addToHistory(obj, id, clock, len)
             % add time and length of queue at time clock to history for
             % plotting
-            if (length(obj.queueHistory.time) >= 1 && obj.queueHistory.time{end} == clock && obj.queueHistory.lengths{end} == len)
+            if (length(obj.queueHistory.time{id}) >= 1 && obj.queueHistory.time{id}{end} == clock && obj.queueHistory.lengths{id}{end} == len)
                 % dont add
-            elseif (length(obj.queueHistory.time) >= 2 && obj.queueHistory.time{end-1} == clock && obj.queueHistory.lengths{end-1} == len)
-                obj.queueHistory.time(end) = [];
-                obj.queueHistory.lengths(end) = [];
-            elseif (length(obj.queueHistory.time) >= 2 && obj.queueHistory.time{end-1} == clock)
-                obj.queueHistory.time{end} = clock;
-                obj.queueHistory.lengths{end} = len;
+            elseif (length(obj.queueHistory.time{id}) >= 2 && obj.queueHistory.time{id}{end-1} == clock && obj.queueHistory.lengths{id}{end-1} == len)
+                obj.queueHistory.time{id}(end) = [];
+                obj.queueHistory.lengths{id}(end) = [];
+            elseif (length(obj.queueHistory.time{id}) >= 2 && obj.queueHistory.time{id}{end-1} == clock)
+                obj.queueHistory.time{id}{end} = clock;
+                obj.queueHistory.lengths{id}{end} = len;
             else
-                obj.queueHistory.time{end+1} = clock;
-                obj.queueHistory.lengths{end+1} = len;
+                obj.queueHistory.time{id}{end+1} = clock;
+                obj.queueHistory.lengths{id}{end+1} = len;
             end
         end
     end
@@ -109,10 +109,20 @@ classdef CheckupRoom < handle
         
         
         
-        function changeQueueSize(obj, clock, diff)
-            lastLength = obj.queueHistory.lengths{end};
-            obj.addToHistory(clock, lastLength);
-            obj.addToHistory(clock, lastLength + diff);
+        function changeQueueSize(obj, hasCorona, clock, diff)
+            lastLength = obj.queueHistory.lengths{1}{end};
+            obj.addToHistory(1, clock, lastLength);
+            obj.addToHistory(1, clock, lastLength + diff);
+            
+            if hasCorona
+                lastLength = obj.queueHistory.lengths{2}{end};
+                obj.addToHistory(2, clock, lastLength);
+                obj.addToHistory(2, clock, lastLength + diff);
+            else
+                lastLength = obj.queueHistory.lengths{3}{end};
+                obj.addToHistory(3, clock, lastLength);
+                obj.addToHistory(3, clock, lastLength + diff);    
+            end
         end
     end
 end
