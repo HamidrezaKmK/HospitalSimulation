@@ -28,7 +28,7 @@ function outputQueueLengths(hospital)
         subplot(3, M, i);
         X = cell2mat(hospital.rooms{i}.queueHistory.time{1});
         Y = cell2mat(hospital.rooms{i}.queueHistory.lengths{1});
-        plot(X, Y), xlabel('time'), ylabel('queue length'), title(sprintf('queue length of room no.%d during time', i));
+        plot(X, Y), xlabel('time'), ylabel('queue length'), title(sprintf('room %d', i));
         deltaT = hospital.rooms{i}.queueHistory.time{1}{end};
         if deltaT
             fprintf('average queue length of room no.%d: %f\n', i, trapz(X, Y) / deltaT);
@@ -37,7 +37,7 @@ function outputQueueLengths(hospital)
         subplot(3, M, i + M);
         X = cell2mat(hospital.rooms{i}.queueHistory.time{2});
         Y = cell2mat(hospital.rooms{i}.queueHistory.lengths{2});
-        plot(X, Y), xlabel('time'), ylabel('queue length'), title(sprintf('queue length of room no.%d during time (with Corona)', i));
+        plot(X, Y), xlabel('time'), ylabel('queue length'), title(sprintf('room %d (with Corona)', i));
         deltaT = hospital.rooms{i}.queueHistory.time{2}{end};
         if deltaT
             fprintf('average queue length of room no.%d (with Corona): %f\n', i, trapz(X, Y) / deltaT);
@@ -46,7 +46,7 @@ function outputQueueLengths(hospital)
         subplot(3, M, i + M + M);
         X = cell2mat(hospital.rooms{i}.queueHistory.time{3});
         Y = cell2mat(hospital.rooms{i}.queueHistory.lengths{3});
-        plot(X, Y), xlabel('time'), ylabel('queue length'), title(sprintf('queue length of room no.%d during time (without Corona)', i));
+        plot(X, Y), xlabel('time'), ylabel('queue length'), title(sprintf('room %d (without Corona)', i));
         deltaT = hospital.rooms{i}.queueHistory.time{3}{end};
         if deltaT
             fprintf('average queue length of room no.%d (without Corona): %f\n', i, trapz(X, Y) / deltaT);
