@@ -29,7 +29,7 @@ function hospital = simulate(simulationInput)
     for i = 1:patient_count
         dt = exprnd(1/lambda);
         T_accumulated = T_accumulated + dt;
-        boredDuration = exprnd(alpha);
+        boredDuration = alpha;
         entrance_event = [T_accumulated, ENTER_HOSPITAL, i, -1, -1];
         E.insert(entrance_event);
         bored_event = [T_accumulated + boredDuration, GOT_BORED, i, -1, -1];

@@ -1,1 +1,0 @@
-function accuracy = calcSimulationAccuracy(input)    % using formula: (1.96 * std) / (sqrt(rep), mu)    % calculates accuracy of mean reception queue length    REP = 50;    means = zeros(REP);    for i = 1 : REP        hosp = simulate(input);        means(i) = getMeanQueueTime(hosp);    end    accuracy = (1.96 * std(means)) / (sqrt(length(means)), mean(means))end
