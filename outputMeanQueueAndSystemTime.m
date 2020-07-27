@@ -29,7 +29,7 @@ function outputMeanQueueAndSystemTime(hospital)
     results.healthy_timeinqueue = cell2mat(results.healthy_timeinqueue);
     results.is_bored = cell2mat(results.is_bored);
     fprintf("mean time in system for all: %f, for infected: %f, for healthy: %f\n", mean(results.all_timeinsystem), mean(results.infected_timeinsystem), mean(results.healthy_timeinsystem));
-    fprintf("mean time in system for all: %f, for infected: %f, for healthy: %f\n", mean(results.all_timeinqueue), mean(results.infected_timeinqueue), mean(results.healthy_timeinqueue));
+    fprintf("mean time in queue for all: %f, for infected: %f, for healthy: %f\n", mean(results.all_timeinqueue), mean(results.infected_timeinqueue), mean(results.healthy_timeinqueue));
     fprintf("average number of bored patients: %f\n" , mean(results.is_bored));
     
 end

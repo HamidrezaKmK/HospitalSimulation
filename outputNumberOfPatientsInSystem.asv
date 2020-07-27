@@ -12,23 +12,22 @@ function outputNumberOfPatientsInSystem(hospital)
 
     while qq.size() > 0
         pk = qq.peek();
-        qq.remove();
         for type = 1:3
-            if type == 1 || (3 - type == pk(3))
-                results.numberInSystemPlot.X{type}{end+1} = pk(1);
-                results.numberInSystemPlot.Y{type}{end+1} = results.numberInSystemPlot.Y{type}{end};
-                results.numberInSystemPlot.X{type}{end+1} = pk(1);
+            if type == 1 || (type - 1 == pk(3))
+                results.numberInSystemPlot.X{end+1} = pk(1);
+                results.numberInSystemPlot.Y{end+1} = results.numberInSystemPlot.Y{end};
+                results.numberInSystemPlot.X{end+1} = pk(1);
                 ad = pk(2);
-                results.numberInSystemPlot.Y{type}{end+1} = results.numberInSystemPlot.Y{type}{end} + ad;
+                qq.remove();
+                results.numberInSystemPlot.Y{end+1} = results.numberInSystemPlot.Y{end} + ad;
             end 
         end
     end
     
-    res = {' (general)', ' (infected)', ' (healthy)'};
+    res = {"general", "
     for d = 1:3
-        subplot(3, 1, d);
         results.numberInSystemPlot.X{d} = cell2mat(results.numberInSystemPlot.X{d});
         results.numberInSystemPlot.Y{d} = cell2mat(results.numberInSystemPlot.Y{d});
-        plot(results.numberInSystemPlot.X{d}, results.numberInSystemPlot.Y{d}), xlabel("time"), ylabel("number of patients in system"), title(strcat("number of patients in system", res{d}));
+        plot(results.numberInSystemPlot.X, results.numberInSystemPlot.Y), xlabel("time"), ylabel("number of patients in system"), title("number of patients in system");
     end
 end
